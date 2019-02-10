@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/gocb"
 )
@@ -36,7 +37,22 @@ func main() {
 		fmt.Println("ERROR OPENING BUCKET:", err)
 	}
 
-	a := couchBaseResponse{}
-	bucket.Get("User:"+os.Getenv("USER"), &a)
-	fmt.Printf("User: %+v\n", a)
+	resp := couchBaseResponse{}
+	bucket.Get("User:"+os.Getenv("USER"), &resp)
+
+	os := strings.ToLower(os.Getenv("OS_TYPE"))
+	if os == "" {
+		for _, v := range resp.Devices {
+			fmt.Println(v)
+		}
+	} else {
+		for _, v := range resp.Devices {
+			if os == "android" && strings.Contains(v, "google") {
+				fmt.Println(v)
+			} else if os == "ios" && strings.Contains(v, "apple") {
+				fmt.Println(v)
+			}
+		}
+	}
+
 }
